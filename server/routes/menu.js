@@ -8,6 +8,55 @@ const adminAuth = require('../middleware/adminAuth');
 
 const uploadDirectory = path.resolve(__dirname, '../../public/img/menu');
 const maxImageBytes = 2.5 * 1024 * 1024;
+const defaultMenuItems = [
+  {
+    name: 'Fried Rice and Plantain with Peppered Chicken',
+    description: 'Seasoned fried rice served with sweet plantain and spicy peppered chicken.',
+    price: 1500,
+    image: 'img/Fried_rice__plantain_and_peppered_chicken-removebg-preview.png',
+  },
+  {
+    name: 'Jollof Rice and Pork with Plantain',
+    description: 'Smoky jollof rice with tender pork and sweet fried plantain.',
+    price: 1800,
+    image: 'img/jollof-rice-with-pork-and-plaintain-removebg-preview.png',
+  },
+  {
+    name: '5 Chicken Wings',
+    description: 'Five crispy, flavourful chicken wings.',
+    price: 4000,
+    image: 'img/chicken_wings-removebg-preview.png',
+  },
+  {
+    name: '10 Fried Chicken',
+    description: 'A generous serving of ten pieces of crispy fried chicken.',
+    price: 8000,
+    image: 'img/pinpng.com-fried-chicken-png-1792517__1_-removebg-preview.png',
+  },
+  {
+    name: 'Fried Chicken',
+    description: 'Golden fried chicken, crisp on the outside and tender inside.',
+    price: 9000,
+    image: 'img/22-removebg-preview.png',
+  },
+].map(item => ({ ...item, category: 'main', available: true }));
+let defaultMenuSeedPromise;
+
+function ensureDefaultMenuItems() {
+  if (!defaultMenuSeedPromise) {
+    defaultMenuSeedPromise = Promise.all(defaultMenuItems.map(item => MenuItem.updateOne(
+      { name: item.name },
+      { $setOnInsert: item },
+      { upsert: true }
+    ))).catch(error => {
+      defaultMenuSeedPromise = undefined;
+      throw error;
+    });
+  }
+
+  return defaultMenuSeedPromise;
+}
+
 const imageTypes = {
   'image/jpeg': {
     extension: 'jpg',
@@ -35,6 +84,7 @@ const imageTypes = {
 // GET all menu items
 router.get('/', async (req, res) => {
   try {
+    await ensureDefaultMenuItems();
     const items = await MenuItem.find({ available: true });
     res.json(items);
   } catch (err) {
