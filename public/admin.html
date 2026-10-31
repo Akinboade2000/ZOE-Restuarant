@@ -98,6 +98,23 @@
 		.menu-form__message { margin: 0; color: var(--muted); font-size: 11px; }
 		.menu-items { margin-top: 20px; }
 		.menu-items td { white-space: normal; }
+		.admin-access { margin: 0 0 18px; padding: 18px 19px; }
+		.admin-access h2 { margin: 0; font-size: 14px; }
+		.admin-access__form { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; margin-top: 13px; }
+		.admin-access__form label { display: grid; flex: 1 1 250px; gap: 6px; color: #62665f; font-size: 11px; font-weight: 650; }
+		.admin-access__form input { width: 100%; padding: 10px 11px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: white; font: inherit; font-size: 12px; }
+		.admin-access__message { margin: 10px 0 0; color: var(--muted); font-size: 11px; }
+		.admin-access__message[data-state="error"], .menu-form__message[data-state="error"] { color: #a4352a; }
+		.admin-access__message[data-state="success"], .menu-form__message[data-state="success"] { color: var(--green); }
+		.order-customer, .order-items { display: grid; gap: 3px; white-space: normal; min-width: 150px; }
+		.order-customer span, .order-items span { overflow-wrap: anywhere; }
+		.order-customer span:not(:first-child) { color: var(--muted); font-size: 10px; }
+		.order-status-select { padding: 6px 8px; border: 1px solid var(--line); border-radius: 7px; background: white; color: var(--ink); font-size: 10px; }
+		.chart-label { fill: #90948c; font-size: 9px; }
+		.chart-summary span { color: var(--muted); }
+		.best-sellers { display: grid; gap: 11px; margin: 0; padding: 0; list-style: none; }
+		.best-sellers li { display: flex; justify-content: space-between; gap: 12px; color: #62665f; font-size: 11px; }
+		.best-sellers strong { color: var(--ink); white-space: nowrap; }
 		@media (max-width: 520px) { .menu-form { grid-template-columns: 1fr; }.menu-form__wide { grid-column: auto; }.menu-form__actions { align-items: flex-start; flex-direction: column; } }
 		.text-button { color: var(--green); background: none; border: 0; font-size: 11px; font-weight: 650; }
 		.table-scroll { overflow-x: auto; }
@@ -129,7 +146,7 @@
 				<a href="#menu"><span class="nav-icon">☷</span><span>Menu</span></a>
 				<a href="#customers"><span class="nav-icon">♙</span><span>Customers</span></a>
 				<a href="#analytics"><span class="nav-icon">▥</span><span>Analytics</span></a>
-				<a href="#settings"><span class="nav-icon">⚙</span><span>Settings</span></a>
+				<a href="#admin-access"><span class="nav-icon">⚙</span><span>Admin access</span></a>
 			</nav>
 			<div class="side-bottom"><div class="help-card"><strong>Need a hand?</strong><p>Visit the help center for tips on managing your restaurant.</p></div></div>
 		</aside>
@@ -137,21 +154,34 @@
 		<main id="overview">
 			<header class="topbar">
 				<div class="crumb">Restaurant / <strong>Overview</strong></div>
-				<div class="top-actions"><span class="date-label" id="today"></span><button class="icon-button" aria-label="Notifications">♧</button><div class="profile"><span class="avatar">JD</span><span>Director Bliss</span></div></div>
+				<div class="top-actions"><span class="date-label" id="today"></span><button class="icon-button" aria-label="Notifications">♧</button><div class="profile"><span class="avatar">DB</span><span>Director Bliss</span></div></div>
 			</header>
 			<div class="content">
-				<section class="heading"><div><h1>Good morning, Chef Bliss 👋</h1><p class="subtitle">Here’s what’s happening at your restaurant today.</p></div><button class="primary" id="new-order">＋ New order</button></section>
+				<section class="heading"><div><h1>Restaurant dashboard</h1><p class="subtitle">Live orders, menu items, and sales from your restaurant.</p></div><a class="primary" href="index.html" style="text-decoration:none">View storefront</a></section>
 
 				<section class="metrics" aria-label="Today's metrics">
-					<article class="card metric"><div class="metric-top"><span>Today's revenue</span><span class="metric-icon">₦</span></div><div class="metric-value" id="revenue-total">₦0</div><div class="trend" id="revenue-trend">— <span>vs. today</span></div></article>
-					<article class="card metric"><div class="metric-top"><span>Total orders</span><span class="metric-icon">▤</span></div><div class="metric-value" id="total-orders">0</div><div class="trend" id="orders-trend">— <span>in queue</span></div></article>
-					<article class="card metric"><div class="metric-top"><span>Avg. order value</span><span class="metric-icon">◉</span></div><div class="metric-value" id="avg-order-value">₦0</div><div class="trend" id="avg-trend">— <span>per order</span></div></article>
-					<article class="card metric"><div class="metric-top"><span>Pending orders</span><span class="metric-icon">▣</span></div><div class="metric-value" id="pending-orders">0</div><div class="trend" id="pending-trend">— <span>need attention</span></div></article>
+					<article class="card metric"><div class="metric-top"><span>Today's sales</span><span class="metric-icon">₦</span></div><div class="metric-value" id="revenue-total">—</div><div class="trend">Paid orders <span>today</span></div></article>
+					<article class="card metric"><div class="metric-top"><span>Orders today</span><span class="metric-icon">▤</span></div><div class="metric-value" id="total-orders">—</div><div class="trend">Orders <span>placed today</span></div></article>
+					<article class="card metric"><div class="metric-top"><span>Active orders</span><span class="metric-icon">◉</span></div><div class="metric-value" id="pending-orders">—</div><div class="trend">Need fulfillment <span>now</span></div></article>
+					<article class="card metric"><div class="metric-top"><span>Available menu items</span><span class="metric-icon">☷</span></div><div class="metric-value" id="menu-item-count">—</div><div class="trend">Shown <span>on the website</span></div></article>
+				</section>
+
+				<section class="card admin-access" id="admin-access">
+					<h2>Admin access</h2>
+					<p class="menu-admin__intro">Enter the admin token saved in your Vercel environment variables to load orders and add menu items. If you have lost it, replace ADMIN_TOKEN in Vercel and redeploy; keep the token private.</p>
+					<form class="admin-access__form" id="admin-login-form">
+						<label for="admin-token-input">Admin token
+							<input id="admin-token-input" type="password" autocomplete="current-password" required>
+						</label>
+						<button class="primary" id="admin-login-button" type="submit">Sign in</button>
+						<button class="text-button" id="admin-logout-button" type="button" hidden>Sign out</button>
+					</form>
+					<p class="admin-access__message" id="admin-access-message" role="status" aria-live="polite">Sign in to load order details and enable food updates.</p>
 				</section>
 
 				<section class="card menu-admin" id="menu">
 					<h2>Add food to the menu</h2>
-					<p class="menu-admin__intro">New items are saved and appear on the home page and full menu.</p>
+					<p class="menu-admin__intro">Add a name, description, price, and optional food picture. New items appear on the home page and full menu.</p>
 					<form class="menu-form" id="menu-form">
 						<label>Name
 							<input id="food-name" name="name" type="text" maxlength="100" required>
@@ -167,38 +197,38 @@
 							<img id="food-image-preview" class="menu-form__image-preview" alt="Selected food picture preview" hidden>
 						</label>
 						<div class="menu-form__wide menu-form__actions">
-							<button class="primary" id="add-food-button" type="submit">Add food</button>
+							<button class="primary" id="add-food-button" type="submit" disabled>Add food</button>
 							<p class="menu-form__message" id="menu-form-message" role="status" aria-live="polite"></p>
 						</div>
 					</form>
 					<div class="table-scroll menu-items">
-						<table><thead><tr><th>Picture</th><th>Food</th><th>Description</th><th>Price</th></tr></thead><tbody id="menu-items-list"><tr><td colspan="4" class="empty-state">Loading menu…</td></tr></tbody></table>
+						<table><thead><tr><th>Picture</th><th>Food</th><th>Description</th><th>Category</th><th>Price</th><th>Visibility</th></tr></thead><tbody id="menu-items-list"><tr><td colspan="6" class="empty-state">Loading menu…</td></tr></tbody></table>
 					</div>
 				</section>
 
 				<section class="dashboard-grid">
 					<article class="card panel" id="analytics">
-						<div class="panel-heading"><div><h2>Revenue overview</h2><p>Track your restaurant's performance</p></div><select class="select" aria-label="Revenue timeframe"><option>This week</option><option>This month</option><option>This year</option></select></div>
-						<div class="chart-summary"><strong>$18,425</strong><span>↗ 10.6%</span></div>
-						<svg class="chart" viewBox="0 0 620 190" preserveAspectRatio="none" role="img" aria-label="Revenue chart, rising throughout the week">
+						<div class="panel-heading"><div><h2>Sales overview</h2><p>Confirmed paid orders only</p></div><select class="select" id="revenue-timeframe" aria-label="Sales timeframe"><option value="week">Last 7 days</option><option value="month">Last 4 weeks</option><option value="year">Last 12 months</option></select></div>
+						<div class="chart-summary"><strong id="chart-total">—</strong><span id="chart-caption">Sign in to view sales</span></div>
+						<svg class="chart" viewBox="0 0 620 190" preserveAspectRatio="none" role="img" aria-label="Sales chart based on confirmed paid orders">
 							<defs><linearGradient id="areaFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#6c9a74" stop-opacity=".23"/><stop offset="100%" stop-color="#6c9a74" stop-opacity="0"/></linearGradient></defs>
-							<line class="gridline" x1="40" y1="25" x2="610" y2="25"/><line class="gridline" x1="40" y1="70" x2="610" y2="70"/><line class="gridline" x1="40" y1="115" x2="610" y2="115"/><line class="gridline" x1="40" y1="160" x2="610" y2="160"/>
-							<text class="chart-label" x="2" y="28">$4k</text><text class="chart-label" x="2" y="73">$3k</text><text class="chart-label" x="2" y="118">$2k</text><text class="chart-label" x="2" y="163">$1k</text>
-							<path class="chart-area" d="M40 133 C75 126 80 114 130 118 S190 95 225 105 S290 76 325 91 S390 59 420 75 S475 48 510 61 S570 37 610 42 L610 165 L40 165Z"/>
-							<path class="chart-line" d="M40 133 C75 126 80 114 130 118 S190 95 225 105 S290 76 325 91 S390 59 420 75 S475 48 510 61 S570 37 610 42"/>
-							<text class="chart-label" x="38" y="183">Mon</text><text class="chart-label" x="130" y="183">Tue</text><text class="chart-label" x="225" y="183">Wed</text><text class="chart-label" x="322" y="183">Thu</text><text class="chart-label" x="418" y="183">Fri</text><text class="chart-label" x="513" y="183">Sat</text><text class="chart-label" x="594" y="183">Sun</text>
+							<g id="chart-grid"></g><g id="chart-y-labels"></g><path class="chart-area" id="chart-area" d=""/><path class="chart-line" id="chart-line" d=""/><g id="chart-x-labels"></g>
 						</svg>
 					</article>
 					<article class="card panel">
-						<div class="panel-heading"><div><h2>Popular categories</h2><p>Sales breakdown this week</p></div><button class="text-button" type="button">Details</button></div>
-						<div class="progress-wrap"><div class="donut" role="img" aria-label="Category sales breakdown"><div class="donut-inner"><strong>100%</strong><span>of sales</span></div></div></div>
-						<div class="legend"><div class="legend-item"><span class="dot"></span>Main dishes · 42%</div><div class="legend-item"><span class="dot two"></span>Drinks · 27%</div><div class="legend-item"><span class="dot three"></span>Starters · 17%</div><div class="legend-item"><span class="dot four"></span>Desserts · 14%</div></div>
+						<div class="panel-heading"><div><h2>Best-selling foods</h2><p>Ranked by quantity in paid orders</p></div></div>
+						<ol class="best-sellers" id="best-sellers"><li>Sign in to view sales data.</li></ol>
 					</article>
 				</section>
 
 				<section class="card table-panel" id="orders">
 					<div class="table-head"><h2>Recent orders</h2><button class="text-button" id="view-orders" type="button">View all orders →</button></div>
-					<div class="table-scroll"><table><thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Time</th><th>Total</th><th>Status</th></tr></thead><tbody id="orders-list"><tr><td colspan="6" class="empty-state">Loading orders…</td></tr></tbody></table></div>
+					<div class="table-scroll"><table><thead><tr><th>Order</th><th>Customer contact</th><th>Delivery address</th><th>Items</th><th>Placed</th><th>Total</th><th>Payment</th><th>Order status</th></tr></thead><tbody id="orders-list"><tr><td colspan="8" class="empty-state">Sign in to load order details.</td></tr></tbody></table></div>
+				</section>
+
+				<section class="card table-panel" id="customers" style="margin-top:18px">
+					<div class="table-head"><h2>Customers</h2></div>
+					<div class="table-scroll"><table><thead><tr><th>Customer</th><th>Email</th><th>Phone</th><th>Orders</th><th>Paid total</th><th>Last order</th></tr></thead><tbody id="customers-list"><tr><td colspan="6" class="empty-state">Sign in to load customer details.</td></tr></tbody></table></div>
 				</section>
 			</div>
 		</main>
@@ -207,6 +237,7 @@
 		const API_URL = `${window.location.origin}/api`;
 		const state = {
 			token: localStorage.getItem('zoe-admin-token') || '',
+			authenticated: false,
 			orders: [],
 			menuItems: [],
 		};
@@ -214,113 +245,340 @@
 		const today = new Date();
 		document.getElementById('today').textContent = today.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
 
-		const orderBadgeClassMap = {
-			pending: 'status',
-			paid: 'status',
-			preparing: 'status preparing',
-			delivering: 'status ready',
-			completed: 'status',
-			cancelled: 'status ready',
-		};
-		const orderLabelMap = {
-			pending: 'Pending',
+		const formatCurrency = value => `₦${Number(value || 0).toLocaleString()}`;
+		const paidStatuses = new Set(['paid', 'preparing', 'delivering', 'completed']);
+		const activeStatuses = new Set(['pending', 'paid', 'preparing', 'delivering']);
+		const orderStatuses = ['pending', 'paid', 'preparing', 'delivering', 'completed', 'cancelled'];
+		const orderLabels = {
+			pending: 'Pending payment',
 			paid: 'Paid',
 			preparing: 'Preparing',
 			delivering: 'Delivering',
 			completed: 'Completed',
 			cancelled: 'Cancelled',
 		};
+		const isSameLocalDay = (first, second) =>
+			first.getFullYear() === second.getFullYear() &&
+			first.getMonth() === second.getMonth() &&
+			first.getDate() === second.getDate();
+		const isValidDate = value => {
+			const date = new Date(value);
+			return Number.isNaN(date.getTime()) ? null : date;
+		};
+		const createCell = (row, value, className) => {
+			const cell = row.insertCell();
+			if (className) cell.className = className;
+			cell.textContent = value || '—';
+			return cell;
+		};
+		const setTableMessage = (tableId, columnCount, message) => {
+			const body = document.getElementById(tableId);
+			body.replaceChildren();
+			const row = body.insertRow();
+			const cell = row.insertCell();
+			cell.colSpan = columnCount;
+			cell.className = 'empty-state';
+			cell.textContent = message;
+		};
+		const setAdminMessage = (message, isError = false, isSuccess = false) => {
+			const status = document.getElementById('admin-access-message');
+			status.textContent = message;
+			status.dataset.state = isError ? 'error' : isSuccess ? 'success' : '';
+		};
+		const setMenuMessage = (message, isError = false, isSuccess = false) => {
+			const status = document.getElementById('menu-form-message');
+			status.textContent = message;
+			status.dataset.state = isError ? 'error' : isSuccess ? 'success' : '';
+		};
+		const updateAccessUI = () => {
+			document.getElementById('add-food-button').disabled = !state.authenticated;
+			document.getElementById('admin-login-button').hidden = state.authenticated;
+			document.getElementById('admin-token-input').disabled = state.authenticated;
+			document.getElementById('admin-logout-button').hidden = !state.authenticated;
+		};
+		const setDashboardUnavailable = message => {
+			['revenue-total', 'total-orders', 'pending-orders'].forEach(id => {
+				document.getElementById(id).textContent = '—';
+			});
+			document.getElementById('chart-total').textContent = '—';
+			document.getElementById('chart-caption').textContent = message;
+			document.getElementById('best-sellers').replaceChildren();
+			const seller = document.createElement('li');
+			seller.textContent = message;
+			document.getElementById('best-sellers').appendChild(seller);
+			setTableMessage('orders-list', 8, message);
+			setTableMessage('customers-list', 6, message);
+		};
+		const setTokenInvalid = message => {
+			state.authenticated = false;
+			state.token = '';
+			state.orders = [];
+			localStorage.removeItem('zoe-admin-token');
+			updateAccessUI();
+			setAdminMessage(message, true);
+			setDashboardUnavailable('Sign in with the current admin token to view this data.');
+		};
+		const drawSalesChart = () => {
+			const range = document.getElementById('revenue-timeframe').value;
+			const now = new Date();
+			const startOfDay = date => new Date(date.getFullYear(), date.getMonth(), date.getDate());
+			let buckets;
+			if (range === 'year') {
+				buckets = Array.from({ length: 12 }, (_, index) => {
+					const date = new Date(now.getFullYear(), now.getMonth() - 11 + index, 1);
+					return {
+						key: `${date.getFullYear()}-${date.getMonth()}`,
+						label: date.toLocaleDateString(undefined, { month: 'short' }),
+						value: 0,
+					};
+				});
+			} else if (range === 'month') {
+				buckets = Array.from({ length: 4 }, (_, index) => {
+					const date = new Date(startOfDay(now));
+					date.setDate(date.getDate() - 27 + index * 7);
+					return { key: String(index), label: date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }), value: 0 };
+				});
+			} else {
+				buckets = Array.from({ length: 7 }, (_, index) => {
+					const date = new Date(startOfDay(now));
+					date.setDate(date.getDate() - 6 + index);
+					return {
+						key: `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`,
+						label: date.toLocaleDateString(undefined, { weekday: 'short' }),
+						value: 0,
+					};
+				});
+			}
 
-		const formatCurrency = value => `₦${Number(value || 0).toLocaleString()}`;
-		const formatItemsText = items => {
-			if (!Array.isArray(items) || !items.length) return '0 items';
-			const total = items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
-			return `${total} ${total === 1 ? 'item' : 'items'}`;
+			const monthStart = new Date(now.getFullYear(), now.getMonth() - 11, 1);
+			const dayStart = startOfDay(now);
+			state.orders.forEach(order => {
+				if (!paidStatuses.has(order.status)) return;
+				const date = isValidDate(order.createdAt);
+				if (!date) return;
+				let bucket;
+				if (range === 'year') {
+					if (date < monthStart) return;
+					bucket = buckets.find(item => item.key === `${date.getFullYear()}-${date.getMonth()}`);
+				} else if (range === 'month') {
+					const daysAgo = Math.floor((dayStart - startOfDay(date)) / 86400000);
+					if (daysAgo < 0 || daysAgo >= 28) return;
+					bucket = buckets[Math.floor((27 - daysAgo) / 7)];
+				} else {
+					bucket = buckets.find(item => item.key === `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`);
+				}
+				if (bucket) bucket.value += Number(order.total) || 0;
+			});
+
+			const total = buckets.reduce((sum, bucket) => sum + bucket.value, 0);
+			document.getElementById('chart-total').textContent = formatCurrency(total);
+			document.getElementById('chart-caption').textContent = range === 'week' ? 'Last 7 days' : range === 'month' ? 'Last 4 weeks' : 'Last 12 months';
+			const max = Math.max(...buckets.map(bucket => bucket.value), 1);
+			const xFor = index => 40 + (570 * index) / Math.max(buckets.length - 1, 1);
+			const yFor = value => 160 - (value / max) * 125;
+			const line = buckets.map((bucket, index) => `${index ? 'L' : 'M'}${xFor(index)} ${yFor(bucket.value)}`).join(' ');
+			document.getElementById('chart-line').setAttribute('d', line);
+			document.getElementById('chart-area').setAttribute('d', `${line} L610 165 L40 165Z`);
+
+			const grid = document.getElementById('chart-grid');
+			const yLabels = document.getElementById('chart-y-labels');
+			const xLabels = document.getElementById('chart-x-labels');
+			[grid, yLabels, xLabels].forEach(group => group.replaceChildren());
+			const svg = 'http://www.w3.org/2000/svg';
+			for (let index = 0; index < 4; index++) {
+				const y = 25 + index * 45;
+				const value = Math.round(max * (3 - index) / 3);
+				const gridline = document.createElementNS(svg, 'line');
+				gridline.setAttribute('class', 'gridline');
+				gridline.setAttribute('x1', '40');
+				gridline.setAttribute('x2', '610');
+				gridline.setAttribute('y1', String(y));
+				gridline.setAttribute('y2', String(y));
+				grid.appendChild(gridline);
+				const label = document.createElementNS(svg, 'text');
+				label.setAttribute('class', 'chart-label');
+				label.setAttribute('x', '2');
+				label.setAttribute('y', String(y + 3));
+				label.textContent = formatCurrency(value);
+				yLabels.appendChild(label);
+			}
+			buckets.forEach((bucket, index) => {
+				if (buckets.length > 7 && index % 2 !== 0 && index !== buckets.length - 1) return;
+				const label = document.createElementNS(svg, 'text');
+				label.setAttribute('class', 'chart-label');
+				label.setAttribute('text-anchor', index === 0 ? 'start' : index === buckets.length - 1 ? 'end' : 'middle');
+				label.setAttribute('x', String(xFor(index)));
+				label.setAttribute('y', '183');
+				label.textContent = bucket.label;
+				xLabels.appendChild(label);
+			});
 		};
-		const formatDisplayTime = value => {
-			const date = value ? new Date(value) : new Date();
-			if (Number.isNaN(date.getTime())) return 'Just now';
-			return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-		};
-		const initialsFromName = name => {
-			if (!name || !name.trim()) return 'NA';
-			return name.trim().split(/\s+/).slice(0, 2).map(part => part[0].toUpperCase()).join('');
-		};
-		const statusMarkup = status => {
-			const safeStatus = orderBadgeClassMap[status] || 'status';
-			const label = orderLabelMap[status] || 'Pending';
-			return `<span class="${safeStatus}">${label}</span>`;
+		const renderBestSellers = () => {
+			const totals = new Map();
+			state.orders.filter(order => paidStatuses.has(order.status)).forEach(order => {
+				(order.items || []).forEach(item => {
+					const name = typeof item.name === 'string' ? item.name : 'Menu item';
+					totals.set(name, (totals.get(name) || 0) + (Number(item.quantity) || 0));
+				});
+			});
+			const sellers = [...totals.entries()].sort((first, second) => second[1] - first[1]).slice(0, 5);
+			const list = document.getElementById('best-sellers');
+			list.replaceChildren();
+			if (!sellers.length) {
+				const empty = document.createElement('li');
+				empty.textContent = 'No paid food orders in the available order history.';
+				list.appendChild(empty);
+				return;
+			}
+			sellers.forEach(([name, quantity]) => {
+				const row = document.createElement('li');
+				const label = document.createElement('span');
+				const count = document.createElement('strong');
+				label.textContent = name;
+				count.textContent = `${quantity} sold`;
+				row.append(label, count);
+				list.appendChild(row);
+			});
 		};
 		const updateSummaryCards = orders => {
-			const revenue = orders.reduce((sum, order) => sum + Number(order.total || 0), 0);
-			const pending = orders.filter(order => order.status === 'pending' || order.status === 'paid' || order.status === 'preparing').length;
-			document.getElementById('revenue-total').textContent = formatCurrency(revenue);
-			document.getElementById('total-orders').textContent = String(orders.length);
-			document.getElementById('avg-order-value').textContent = orders.length ? formatCurrency(revenue / orders.length) : formatCurrency(0);
-			document.getElementById('pending-orders').textContent = String(pending);
-			document.getElementById('revenue-trend').innerHTML = `${orders.length ? '↗' : '—'} ${orders.length ? 'live order data' : 'no data'} <span>vs. today</span>`;
-			document.getElementById('orders-trend').innerHTML = `${orders.length ? '↗' : '—'} ${orders.length ? 'current queue' : 'waiting'} <span>in queue</span>`;
-			document.getElementById('avg-trend').innerHTML = `${orders.length ? '↗' : '—'} ${orders.length ? 'average' : 'idle'} <span>per order</span>`;
-			document.getElementById('pending-trend').innerHTML = `${pending ? '↗' : '—'} ${pending ? 'needs review' : 'clear'} <span>need attention</span>`;
+			const now = new Date();
+			const todayOrders = orders.filter(order => {
+				const date = isValidDate(order.createdAt);
+				return date && isSameLocalDay(date, now);
+			});
+			const todaySales = todayOrders
+				.filter(order => paidStatuses.has(order.status))
+				.reduce((sum, order) => sum + (Number(order.total) || 0), 0);
+			const active = orders.filter(order => activeStatuses.has(order.status)).length;
+			document.getElementById('revenue-total').textContent = formatCurrency(todaySales);
+			document.getElementById('total-orders').textContent = String(todayOrders.length);
+			document.getElementById('pending-orders').textContent = String(active);
+			document.getElementById('menu-item-count').textContent = String(state.menuItems.length);
+			drawSalesChart();
+			renderBestSellers();
 		};
 		const renderOrders = () => {
 			const body = document.getElementById('orders-list');
+			body.replaceChildren();
 			if (!state.orders.length) {
-				body.innerHTML = '<tr><td colspan="6" class="empty-state">No orders found yet.</td></tr>';
+				setTableMessage('orders-list', 8, 'No orders have been placed yet.');
 				return;
 			}
-
-			body.innerHTML = state.orders.map(order => {
-				const customerName = order.customer?.name || 'Guest';
-				const initials = initialsFromName(customerName);
-				const items = Array.isArray(order.items) ? order.items : [];
-				return `
-					<tr>
-						<td class="order-id">#${String(order._id || '').slice(-4) || 'NEW'}</td>
-						<td><div class="customer"><span class="mini-avatar">${initials}</span>${customerName}</div></td>
-						<td>${formatItemsText(items)}</td>
-						<td>${formatDisplayTime(order.createdAt)}</td>
-						<td>${formatCurrency(order.total || 0)}</td>
-						<td>${statusMarkup(order.status)}</td>
-					</tr>`;
-			}).join('');
+			state.orders.slice(0, 50).forEach(order => {
+				const row = body.insertRow();
+				createCell(row, `#${String(order._id || '').slice(-6) || 'NEW'}`, 'order-id');
+				const customerCell = row.insertCell();
+				customerCell.className = 'order-customer';
+				[order.customer?.name, order.customer?.email, order.customer?.phone].forEach(value => {
+					const detail = document.createElement('span');
+					detail.textContent = value || '—';
+					customerCell.appendChild(detail);
+				});
+				createCell(row, order.customer?.address || '—');
+				const itemsCell = row.insertCell();
+				itemsCell.className = 'order-items';
+				(order.items || []).forEach(item => {
+					const detail = document.createElement('span');
+					detail.textContent = `${Number(item.quantity) || 1} × ${item.name || 'Menu item'}`;
+					itemsCell.appendChild(detail);
+				});
+				const date = isValidDate(order.createdAt);
+				createCell(row, date ? date.toLocaleString() : '—');
+				createCell(row, formatCurrency(order.total));
+				createCell(row, paidStatuses.has(order.status) ? 'Paid' : order.status === 'cancelled' ? 'Cancelled' : 'Awaiting payment');
+				const statusCell = row.insertCell();
+				const select = document.createElement('select');
+				select.className = 'order-status-select';
+				select.setAttribute('aria-label', `Update order ${String(order._id || '').slice(-6)} status`);
+				orderStatuses.forEach(status => {
+					const option = document.createElement('option');
+					option.value = status;
+					option.textContent = orderLabels[status];
+					option.selected = status === order.status;
+					select.appendChild(option);
+				});
+				select.addEventListener('change', () => updateOrderStatus(order, select));
+				statusCell.appendChild(select);
+			});
+		};
+		const renderCustomers = () => {
+			const byEmail = new Map();
+			state.orders.forEach(order => {
+				const customer = order.customer || {};
+				const key = (customer.email || customer.phone || customer.name || 'guest').toLowerCase();
+				const entry = byEmail.get(key) || { customer, orders: [], paidTotal: 0, lastOrder: null };
+				entry.orders.push(order);
+				if (paidStatuses.has(order.status)) entry.paidTotal += Number(order.total) || 0;
+				const date = isValidDate(order.createdAt);
+				if (date && (!entry.lastOrder || date > entry.lastOrder)) entry.lastOrder = date;
+				byEmail.set(key, entry);
+			});
+			const body = document.getElementById('customers-list');
+			body.replaceChildren();
+			if (!byEmail.size) {
+				setTableMessage('customers-list', 6, 'No customer records yet.');
+				return;
+			}
+			[...byEmail.values()].sort((first, second) => (second.lastOrder || 0) - (first.lastOrder || 0)).forEach(entry => {
+				const row = body.insertRow();
+				createCell(row, entry.customer.name);
+				createCell(row, entry.customer.email);
+				createCell(row, entry.customer.phone);
+				createCell(row, String(entry.orders.length));
+				createCell(row, formatCurrency(entry.paidTotal));
+				createCell(row, entry.lastOrder ? entry.lastOrder.toLocaleString() : '—');
+			});
 		};
 		async function fetchOrders() {
 			const response = await fetch(`${API_URL}/orders/admin/all`, {
-				headers: {
-					'Content-Type': 'application/json',
-					'x-admin-token': state.token,
-				},
+				headers: { 'x-admin-token': state.token },
 			});
 			if (!response.ok) {
 				const data = await response.json().catch(() => ({}));
 				throw new Error(data.error || 'Unable to load orders.');
 			}
-			return response.json();
+			const orders = await response.json();
+			if (!Array.isArray(orders)) throw new Error('The server returned an invalid orders list.');
+			return orders;
 		}
-		async function loadOrders() {
+		async function authenticateToken(token) {
+			state.token = token.trim();
+			if (!state.token) throw new Error('Enter your admin token.');
+			const orders = await fetchOrders();
+			state.orders = orders;
+			state.authenticated = true;
+			localStorage.setItem('zoe-admin-token', state.token);
+			document.getElementById('admin-token-input').value = '';
+			updateAccessUI();
+			setAdminMessage('Admin access verified. Orders and menu updates are enabled.', false, true);
+			updateSummaryCards(state.orders);
+			renderOrders();
+			renderCustomers();
+		}
+		async function updateOrderStatus(order, select) {
+			const previousStatus = order.status;
+			select.disabled = true;
 			try {
-				const orders = await fetchOrders();
-				state.orders = Array.isArray(orders) ? orders : [];
+				const response = await fetch(`${API_URL}/orders/admin/${encodeURIComponent(order._id)}/status`, {
+					method: 'PATCH',
+					headers: {
+						'Content-Type': 'application/json',
+						'x-admin-token': state.token,
+					},
+					body: JSON.stringify({ status: select.value }),
+				});
+				const data = await response.json().catch(() => ({}));
+				if (!response.ok) throw new Error(data.error || 'Unable to update order status.');
+				Object.assign(order, data);
 				updateSummaryCards(state.orders);
 				renderOrders();
+				setAdminMessage(`Order #${String(order._id).slice(-6)} updated to ${orderLabels[order.status]}.`, false, true);
 			} catch (error) {
-				console.error('Failed to load orders:', error);
-				const body = document.getElementById('orders-list');
-				body.innerHTML = `<tr><td colspan="6" class="empty-state">${error.message || 'Unable to load orders. Check the admin token.'}</td></tr>`;
-				if (error.message.includes('Unauthorized') || error.message.includes('Forbidden') || error.message.includes('token')) {
-					const saved = localStorage.getItem('zoe-admin-token');
-					const token = window.prompt('Enter the admin token to view orders:', saved || '');
-					if (token !== null) {
-						state.token = token.trim();
-						if (state.token) {
-							localStorage.setItem('zoe-admin-token', state.token);
-						} else {
-							localStorage.removeItem('zoe-admin-token');
-						}
-						loadOrders();
-					}
-				}
+				console.error('Failed to update order status:', error);
+				select.value = previousStatus;
+				setAdminMessage(error.message, true);
+				if (error.message.includes('Unauthorized') || error.message.includes('Forbidden')) setTokenInvalid('Your admin token was rejected. Sign in again with the current token.');
+				select.disabled = false;
 			}
 		}
 
@@ -351,7 +609,7 @@
 			if (!acceptedFoodImageTypes.includes(file.type) || file.size > maxFoodImageBytes) {
 				foodImageInput.value = '';
 				clearFoodImagePreview();
-				menuFormMessage.textContent = 'Choose a PNG, JPEG, or WebP picture no larger than 2.5 MB.';
+				setMenuMessage('Choose a PNG, JPEG, or WebP picture no larger than 2.5 MB.', true);
 				return;
 			}
 
@@ -359,7 +617,7 @@
 			foodImagePreviewUrl = URL.createObjectURL(file);
 			foodImagePreview.src = foodImagePreviewUrl;
 			foodImagePreview.hidden = false;
-			menuFormMessage.textContent = '';
+			setMenuMessage('');
 		});
 
 		function readImageAsDataUrl(file) {
@@ -383,9 +641,10 @@
 			if (!state.menuItems.length) {
 				const row = body.insertRow();
 				const cell = row.insertCell();
-				cell.colSpan = 4;
+				cell.colSpan = 6;
 				cell.className = 'empty-state';
 				cell.textContent = 'No menu items found.';
+				document.getElementById('menu-item-count').textContent = '0';
 				return;
 			}
 
@@ -401,17 +660,20 @@
 					image.src = 'img/dish.svg';
 				};
 				imageCell.appendChild(image);
-				[item.name, item.description || '—', formatCurrency(item.price)].forEach(value => {
+				[item.name, item.description || '—', item.category || 'main', formatCurrency(item.price), item.available ? 'Available' : 'Hidden'].forEach(value => {
 					const cell = row.insertCell();
 					cell.textContent = value;
 				});
 			});
+			document.getElementById('menu-item-count').textContent = String(state.menuItems.length);
+			if (state.authenticated) updateSummaryCards(state.orders);
 		}
 
 		async function loadMenuItems() {
 			const response = await fetch(`${API_URL}/menu`, { cache: 'no-store' });
 			if (!response.ok) {
-				throw new Error('Unable to load menu items.');
+				const data = await response.json().catch(() => ({}));
+				throw new Error(data.error || `Unable to load menu items (HTTP ${response.status}).`);
 			}
 			const items = await response.json();
 			if (!Array.isArray(items)) {
@@ -421,25 +683,63 @@
 			renderMenuItems();
 		}
 
+		document.getElementById('admin-login-form').addEventListener('submit', async event => {
+			event.preventDefault();
+			const button = document.getElementById('admin-login-button');
+			button.disabled = true;
+			setAdminMessage('Checking admin token…');
+			try {
+				await authenticateToken(document.getElementById('admin-token-input').value);
+			} catch (error) {
+				console.error('Admin sign-in failed:', error);
+				if (error.message.includes('Unauthorized') || error.message.includes('Forbidden')) {
+					state.token = '';
+					state.authenticated = false;
+					localStorage.removeItem('zoe-admin-token');
+					updateAccessUI();
+					setAdminMessage('The admin token was rejected. Check the ADMIN_TOKEN value saved in Vercel and try again.', true);
+				} else {
+					setAdminMessage(error.message || 'Unable to sign in. Try again.', true);
+				}
+			} finally {
+				button.disabled = state.authenticated;
+			}
+		});
+
+		document.getElementById('admin-logout-button').addEventListener('click', () => {
+			state.token = '';
+			state.authenticated = false;
+			state.orders = [];
+			localStorage.removeItem('zoe-admin-token');
+			updateAccessUI();
+			setAdminMessage('Signed out. Sign in to load order details and enable food updates.');
+			setDashboardUnavailable('Sign in with the current admin token to view this data.');
+		});
+
 		menuForm.addEventListener('submit', async event => {
 			event.preventDefault();
 			if (!menuForm.reportValidity()) return;
+			if (!state.authenticated) {
+				setMenuMessage('Sign in with your admin token above before adding food.', true);
+				document.getElementById('admin-access').scrollIntoView({ behavior: 'smooth' });
+				return;
+			}
 
 			const name = document.getElementById('food-name').value.trim();
 			const description = document.getElementById('food-description').value.trim();
 			const price = Number(document.getElementById('food-price').value);
 			const imageFile = foodImageInput.files[0];
 			if (!name || !description || !Number.isSafeInteger(price) || price <= 0) {
-				menuFormMessage.textContent = 'Enter a name, description, and a whole-number price greater than zero.';
+				setMenuMessage('Enter a name, description, and a whole-number price greater than zero.', true);
 				return;
 			}
 			if (imageFile && (!acceptedFoodImageTypes.includes(imageFile.type) || imageFile.size > maxFoodImageBytes)) {
-				menuFormMessage.textContent = 'Choose a PNG, JPEG, or WebP picture no larger than 2.5 MB.';
+				setMenuMessage('Choose a PNG, JPEG, or WebP picture no larger than 2.5 MB.', true);
 				return;
 			}
 
 			addFoodButton.disabled = true;
-			menuFormMessage.textContent = 'Saving food…';
+			setMenuMessage('Saving food…');
 			try {
 				const image = imageFile ? await readImageAsDataUrl(imageFile) : undefined;
 				const response = await fetch(`${API_URL}/menu`, {
@@ -452,6 +752,9 @@
 				});
 				const data = await response.json().catch(() => ({}));
 				if (!response.ok) {
+					if (response.status === 401 || response.status === 403) {
+						setTokenInvalid('Your admin token was rejected. Sign in again with the current token.');
+					}
 					throw new Error(data.error || 'Unable to add this food.');
 				}
 
@@ -459,43 +762,38 @@
 				clearFoodImagePreview();
 				await loadMenuItems();
 				localStorage.setItem('zoe-menu-updated', String(Date.now()));
-				menuFormMessage.textContent = `${data.name} added. It is now available on the site menu.`;
+				setMenuMessage(`${data.name} added. It is now available on the site menu.`, false, true);
 			} catch (error) {
 				console.error('Failed to add menu item:', error);
-				menuFormMessage.textContent = error.message || 'Unable to add this food.';
-				if (error.message.includes('Unauthorized') || error.message.includes('Forbidden') || error.message.includes('token')) {
-					localStorage.removeItem('zoe-admin-token');
-					state.token = window.prompt('Enter the admin token to add menu items:', '');
-					if (state.token) {
-						state.token = state.token.trim();
-						localStorage.setItem('zoe-admin-token', state.token);
-						menuFormMessage.textContent = 'Token updated. Submit the form again to add the food.';
-					}
-				}
+				setMenuMessage(error.message || 'Unable to add this food.', true);
 			} finally {
-				addFoodButton.disabled = false;
+				addFoodButton.disabled = !state.authenticated;
 			}
-		});
-
-		document.getElementById('new-order').addEventListener('click', () => {
-			window.location.href = 'index.html';
 		});
 
 		document.getElementById('view-orders').addEventListener('click', () => {
 			document.getElementById('orders').scrollIntoView({ behavior: 'smooth' });
 		});
 
-		loadOrders();
+		document.getElementById('revenue-timeframe').addEventListener('change', drawSalesChart);
+		updateAccessUI();
+		setDashboardUnavailable('Sign in with the current admin token to view this data.');
 		loadMenuItems().catch(error => {
 			console.error('Failed to load menu items:', error);
-			const body = document.getElementById('menu-items-list');
-			body.replaceChildren();
-			const row = body.insertRow();
-			const cell = row.insertCell();
-			cell.colSpan = 4;
-			cell.className = 'empty-state';
-			cell.textContent = error.message;
+			setTableMessage('menu-items-list', 6, error.message);
+			document.getElementById('menu-item-count').textContent = '—';
 		});
+		if (state.token) {
+			authenticateToken(state.token).catch(error => {
+				console.error('Saved admin sign-in failed:', error);
+				if (error.message.includes('Unauthorized') || error.message.includes('Forbidden')) {
+					setTokenInvalid('The saved admin token was rejected. Sign in again with the current token.');
+				} else {
+					setAdminMessage(error.message || 'Unable to load admin data.', true);
+					setDashboardUnavailable('Admin data could not be loaded. Please try signing in again.');
+				}
+			});
+		}
 	</script>
 </body>
 </html>
