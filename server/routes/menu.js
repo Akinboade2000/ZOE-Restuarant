@@ -2,26 +2,30 @@ const router = require('express').Router();
 const { randomUUID } = require('crypto');
 const fs = require('fs/promises');
 const path = require('path');
+const { del, put } = require('@vercel/blob');
 const MenuItem = require('../models/MenuItem');
 const adminAuth = require('../middleware/adminAuth');
 
 const uploadDirectory = path.resolve(__dirname, '../../public/img/menu');
-const maxImageBytes = 5 * 1024 * 1024;
+const maxImageBytes = 2.5 * 1024 * 1024;
 const imageTypes = {
   'image/jpeg': {
     extension: 'jpg',
+    contentType: 'image/jpeg',
     matches(buffer) {
       return buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
     },
   },
   'image/png': {
     extension: 'png',
+    contentType: 'image/png',
     matches(buffer) {
       return buffer.length >= 8 && buffer.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
     },
   },
   'image/webp': {
     extension: 'webp',
+    contentType: 'image/webp',
     matches(buffer) {
       return buffer.length >= 12 && buffer.toString('ascii', 0, 4) === 'RIFF' && buffer.toString('ascii', 8, 12) === 'WEBP';
     },
@@ -42,6 +46,7 @@ router.get('/', async (req, res) => {
 router.post('/', adminAuth, async (req, res) => {
   let imagePath = 'img/dish.svg';
   let savedImagePath;
+  let savedBlobUrl;
   try {
     const { name, description, price, image } = req.body || {};
     if (
@@ -77,15 +82,27 @@ router.post('/', adminAuth, async (req, res) => {
         fileBuffer.toString('base64') !== match[2] ||
         !imageType.matches(fileBuffer)
       ) {
-        return res.status(400).json({ error: 'The food picture is invalid or larger than 5 MB.' });
+        return res.status(400).json({ error: 'The food picture is invalid or larger than 2.5 MB.' });
       }
 
       const filename = `${randomUUID()}.${imageType.extension}`;
-      await fs.mkdir(uploadDirectory, { recursive: true });
-      const destinationPath = path.join(uploadDirectory, filename);
-      await fs.writeFile(destinationPath, fileBuffer, { flag: 'wx' });
-      savedImagePath = destinationPath;
-      imagePath = `img/menu/${filename}`;
+      if (process.env.VERCEL === '1' || process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID) {
+        if (!process.env.BLOB_READ_WRITE_TOKEN && !process.env.BLOB_STORE_ID) {
+          return res.status(503).json({ error: 'Connect a Vercel Blob store before uploading food pictures.' });
+        }
+        const blob = await put(filename, fileBuffer, {
+          access: 'public',
+          contentType: imageType.contentType,
+        });
+        savedBlobUrl = blob.url;
+        imagePath = blob.url;
+      } else {
+        await fs.mkdir(uploadDirectory, { recursive: true });
+        const destinationPath = path.join(uploadDirectory, filename);
+        await fs.writeFile(destinationPath, fileBuffer, { flag: 'wx' });
+        savedImagePath = destinationPath;
+        imagePath = `img/menu/${filename}`;
+      }
     }
 
     const item = await MenuItem.create({
@@ -101,6 +118,11 @@ router.post('/', adminAuth, async (req, res) => {
     if (savedImagePath) {
       await fs.unlink(savedImagePath).catch(cleanupError => {
         console.error('Unable to remove unused menu image:', cleanupError);
+      });
+    }
+    if (savedBlobUrl) {
+      await del(savedBlobUrl).catch(cleanupError => {
+        console.error('Unable to remove unused menu image from Vercel Blob:', cleanupError);
       });
     }
     console.error('Unable to create menu item:', err);

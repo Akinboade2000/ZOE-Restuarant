@@ -162,7 +162,7 @@
 						<label class="menu-form__wide">Description
 							<textarea id="food-description" name="description" maxlength="500" required></textarea>
 						</label>
-						<label class="menu-form__wide">Food picture (optional, PNG/JPEG/WebP, max 5 MB)
+						<label class="menu-form__wide">Food picture (optional, PNG/JPEG/WebP, max 2.5 MB)
 							<input id="food-image" name="image" type="file" accept="image/png,image/jpeg,image/webp">
 							<img id="food-image-preview" class="menu-form__image-preview" alt="Selected food picture preview" hidden>
 						</label>
@@ -204,10 +204,9 @@
 		</main>
 	</div>
 	<script>
-		const DEFAULT_ADMIN_TOKEN = 'zoe-admin-secret-change-me';
 		const API_URL = `${window.location.origin}/api`;
 		const state = {
-			token: localStorage.getItem('zoe-admin-token') || DEFAULT_ADMIN_TOKEN,
+			token: localStorage.getItem('zoe-admin-token') || '',
 			orders: [],
 			menuItems: [],
 		};
@@ -311,7 +310,7 @@
 				body.innerHTML = `<tr><td colspan="6" class="empty-state">${error.message || 'Unable to load orders. Check the admin token.'}</td></tr>`;
 				if (error.message.includes('Unauthorized') || error.message.includes('Forbidden') || error.message.includes('token')) {
 					const saved = localStorage.getItem('zoe-admin-token');
-					const token = window.prompt('Enter the admin token to view orders:', saved || DEFAULT_ADMIN_TOKEN);
+					const token = window.prompt('Enter the admin token to view orders:', saved || '');
 					if (token !== null) {
 						state.token = token.trim();
 						if (state.token) {
@@ -330,7 +329,7 @@
 		const addFoodButton = document.getElementById('add-food-button');
 		const foodImageInput = document.getElementById('food-image');
 		const foodImagePreview = document.getElementById('food-image-preview');
-		const maxFoodImageBytes = 5 * 1024 * 1024;
+		const maxFoodImageBytes = 2.5 * 1024 * 1024;
 		const acceptedFoodImageTypes = ['image/jpeg', 'image/png', 'image/webp'];
 		let foodImagePreviewUrl;
 
@@ -352,7 +351,7 @@
 			if (!acceptedFoodImageTypes.includes(file.type) || file.size > maxFoodImageBytes) {
 				foodImageInput.value = '';
 				clearFoodImagePreview();
-				menuFormMessage.textContent = 'Choose a PNG, JPEG, or WebP picture no larger than 5 MB.';
+				menuFormMessage.textContent = 'Choose a PNG, JPEG, or WebP picture no larger than 2.5 MB.';
 				return;
 			}
 
@@ -435,7 +434,7 @@
 				return;
 			}
 			if (imageFile && (!acceptedFoodImageTypes.includes(imageFile.type) || imageFile.size > maxFoodImageBytes)) {
-				menuFormMessage.textContent = 'Choose a PNG, JPEG, or WebP picture no larger than 5 MB.';
+				menuFormMessage.textContent = 'Choose a PNG, JPEG, or WebP picture no larger than 2.5 MB.';
 				return;
 			}
 
