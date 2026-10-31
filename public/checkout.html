@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout - ZOE Food</title>
+  <link href='https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css' rel='stylesheet'>
+  <link rel="stylesheet" href="CSS/style.css">
+</head>
+<body>
+  <header class="l-header" id="header">
+    <nav class="nav bd-container">
+      <a href="index.html" class="nav__logo">ZOE</a>
+      <a href="menu.html" class="nav__link"><i class='bx bx-arrow-back'></i> Back to Menu</a>
+    </nav>
+  </header>
+
+  <main class="section bd-container" style="padding-top: 6rem;">
+    <h2 class="section-title">Checkout</h2>
+
+    <div class="checkout-grid">
+      <!-- Order Summary -->
+      <div class="checkout-summary">
+        <h3>Your Order</h3>
+        <div id="order-items"></div>
+        <div class="checkout-total">
+          <span>Total:</span>
+          <strong id="order-total">₦0</strong>
+        </div>
+      </div>
+
+      <!-- Customer Details + Payment -->
+      <form class="checkout-form" id="checkout-form">
+        <h3>Delivery Details</h3>
+        <input type="text" id="name" name="name" autocomplete="name" placeholder="Full Name" required>
+        <input type="email" id="email" name="email" autocomplete="email" placeholder="Email" required>
+        <input type="tel" id="phone" name="phone" autocomplete="tel" placeholder="Phone Number" required>
+        <label for="address">Delivery Address</label>
+        <textarea id="address" name="address" autocomplete="street-address" placeholder="Delivery Address" rows="3" required></textarea>
+        <div class="address-map">
+          <div class="address-map__links">
+            <span>Check your delivery location</span>
+            <a id="open-address-map" href="https://www.google.com/maps/search/?api=1&amp;query=OAU%20Ile-Ife" target="_blank" rel="noopener noreferrer">Open in Google Maps</a>
+          </div>
+          <iframe
+            id="address-map"
+            title="Google Maps delivery location"
+            src="https://maps.google.com/maps?q=OAU%20Ile-Ife&amp;output=embed"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade">
+          </iframe>
+          <small>The map updates as you enter your delivery address. Confirm the full address above.</small>
+        </div>
+
+        <h3>Payment</h3>
+        <p>You'll be securely redirected to Paystack to complete your payment.</p>
+        <button type="submit" class="button" id="pay-btn" style="width:100%; margin-top:1rem;">
+          Pay with Paystack
+        </button>
+        <p id="payment-message" role="status" aria-live="polite" style="color:red; margin-top:.5rem;"></p>
+      </form>
+    </div>
+  </main>
+
+  <script src="JS/cart.js"></script>
+  <script src="JS/api.js"></script>
+  <script src="JS/checkout.js"></script>
+</body>
+</html>

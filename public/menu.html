@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Full Menu - ZOE Food</title>
+  <link href='https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css' rel='stylesheet'>
+  <link rel="stylesheet" href="CSS/style.css">
+</head>
+<body>
+  <header class="l-header" id="header">
+    <nav class="nav bd-container">
+      <a href="index.html" class="nav__logo">ZOE</a>
+      <div class="nav__menu" id="nav-menu">
+        <ul class="nav__list">
+          <li class="nav__item"><a href="index.html" class="nav__link">Home</a></li>
+          <li class="nav__item"><a href="menu.html" class="nav__link active-link">Full Menu</a></li>
+          <li class="nav__item" style="position:relative;">
+            <a href="checkout.html" class="nav__link">
+              <i class='bx bx-cart'></i>
+              <span id="cart-badge" class="cart-badge">0</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <button class="nav__toggle" id="nav-toggle" type="button" aria-label="Toggle navigation" aria-controls="nav-menu" aria-expanded="false">
+        <i class='bx bx-menu'></i>
+      </button>
+    </nav>
+  </header>
+
+  <main class="section bd-container" style="padding-top: 6rem;">
+    <span class="section-subtitle">Our Menu</span>
+    <h2 class="section-title">Everything we offer</h2>
+    <div id="menu-grid" class="menu__container bd-grid"></div>
+  </main>
+
+  <aside id="cart-preview" class="cart-preview" aria-label="Your cart">
+    <button id="cart-preview-toggle" class="cart-preview__toggle" type="button" aria-expanded="false" aria-controls="cart-preview-details" aria-label="Open cart, 0 items">
+      <i class='bx bx-cart'></i>
+      <span>Cart</span>
+      <span id="cart-preview-badge" class="cart-preview__badge" hidden>0</span>
+    </button>
+    <section id="cart-preview-details" class="cart-preview__details" aria-label="Cart details" hidden>
+      <div class="cart-preview__heading">
+        <span>Your cart <span id="cart-preview-count" class="cart-preview__count">0 items</span></span>
+        <button id="cart-preview-close" class="cart-preview__close" type="button" aria-label="Close cart">&times;</button>
+      </div>
+      <p id="cart-preview-empty" class="cart-preview__empty">Your cart is empty.</p>
+      <ul id="cart-preview-items" class="cart-preview__items"></ul>
+      <span id="cart-preview-more" class="cart-preview__more" hidden></span>
+      <div class="cart-preview__footer">
+        <span>Subtotal <strong id="cart-preview-total">₦0</strong></span>
+        <a class="cart-preview__action" href="checkout.html">View cart &amp; checkout <i class='bx bx-right-arrow-alt'></i></a>
+      </div>
+    </section>
+  </aside>
+
+  <script src="JS/cart.js"></script>
+  <script src="JS/api.js"></script>
+  <script src="JS/menu.js"></script>
+  <script src="JS/main.js"></script>
+</body>
+</html>

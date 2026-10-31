@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmed - ZOE Food</title>
+  <link href="https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="CSS/style.css">
+</head>
+<body>
+  <main class="section bd-container" style="padding-top: 8rem; text-align:center;">
+    <i id="confirmation-icon" class="bx bx-time-five" style="font-size:5rem; color:var(--first-color);"></i>
+    <h1 id="confirmation-title" class="section-title">Verifying your payment</h1>
+    <p id="confirmation-message" role="status" aria-live="polite" style="margin-bottom:2rem;">Please wait while we confirm your order.</p>
+    <a href="index.html" class="button">Back to Home</a>
+  </main>
+  <script src="JS/cart.js"></script>
+  <script src="JS/api.js"></script>
+  <script>
+    (async () => {
+      const params = new URLSearchParams(window.location.search);
+      const orderId = params.get('orderId');
+      const reference = params.get('reference') || params.get('trxref');
+      const title = document.getElementById('confirmation-title');
+      const message = document.getElementById('confirmation-message');
+      const icon = document.getElementById('confirmation-icon');
+
+      if (!orderId || !reference) {
+        title.textContent = 'Payment not confirmed';
+        message.textContent = 'We could not verify this payment. Your cart has been kept; please contact us or try again.';
+        icon.className = 'bx bx-error-circle';
+        return;
+      }
+
+      try {
+        const response = await fetch(`${window.ZOE_API_URL}/payments/verify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId, reference })
+        });
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || 'The payment could not be verified.');
+        }
+
+        Cart.clear();
+        title.textContent = 'Order Confirmed!';
+        message.textContent = "Thank you! Your payment was successful. We'll start preparing your food shortly.";
+        icon.className = 'bx bx-check-circle';
+      } catch (error) {
+        console.error('Unable to verify payment:', error);
+        title.textContent = 'Payment not confirmed';
+        message.textContent = 'We could not verify this payment. Your cart has been kept; please contact us or try again.';
+        icon.className = 'bx bx-error-circle';
+      }
+    })();
+  </script>
+</body>
+</html>

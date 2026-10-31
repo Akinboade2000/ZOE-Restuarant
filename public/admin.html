@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="theme-color" content="#f7f5f0">
+	<title>Restaurant Admin</title>
+	<style>
+		:root {
+			color-scheme: light;
+			--ink: #20231f;
+			--muted: #777b74;
+			--line: #e9e9e3;
+			--paper: #fff;
+			--canvas: #f7f7f3;
+			--green: #376b4a;
+			--green-light: #eaf2eb;
+			--orange: #e28b45;
+			font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+		}
+		* { box-sizing: border-box; }
+		body { margin: 0; color: var(--ink); background: var(--canvas); }
+		button, input, select { font: inherit; }
+		button { cursor: pointer; }
+		.layout { min-height: 100vh; display: grid; grid-template-columns: 248px minmax(0, 1fr); }
+		.sidebar { background: var(--paper); border-right: 1px solid var(--line); padding: 27px 18px; display: flex; flex-direction: column; }
+		.brand { display: flex; align-items: center; gap: 11px; padding: 0 10px 34px; font-size: 17px; font-weight: 750; letter-spacing: -.4px; }
+		.brand-mark { width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; color: white; background: var(--green); font-size: 19px; }
+		.nav-label { color: #a0a29b; font-size: 10px; font-weight: 750; letter-spacing: 1.3px; padding: 0 12px 10px; }
+		.nav { display: grid; gap: 5px; }
+		.nav a { display: flex; align-items: center; gap: 12px; min-height: 43px; padding: 0 12px; color: #62665f; text-decoration: none; border-radius: 9px; font-size: 13px; font-weight: 550; }
+		.nav a:hover, .nav a.active { color: var(--green); background: var(--green-light); }
+		.nav-icon { width: 19px; text-align: center; font-size: 16px; }
+		.side-bottom { margin-top: auto; padding: 18px 10px 0; }
+		.help-card { border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+		.help-card strong { display: block; font-size: 12px; margin-bottom: 5px; }
+		.help-card p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+		main { min-width: 0; }
+		.topbar { height: 74px; background: var(--paper); border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; padding: 0 34px; }
+		.crumb { color: var(--muted); font-size: 12px; }
+		.top-actions { display: flex; align-items: center; gap: 17px; }
+		.date-label { color: var(--muted); font-size: 12px; }
+		.icon-button { border: 1px solid var(--line); color: #555950; background: white; width: 36px; height: 36px; border-radius: 10px; }
+		.profile { display: flex; align-items: center; gap: 9px; font-size: 12px; font-weight: 650; }
+		.avatar { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; color: var(--green); background: #e6eee6; font-size: 11px; }
+		.content { max-width: 1440px; margin: auto; padding: 31px 34px 42px; }
+		.heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 23px; }
+		h1 { margin: 0 0 5px; font-size: 25px; letter-spacing: -.8px; }
+		.subtitle { margin: 0; color: var(--muted); font-size: 12px; }
+		.primary { border: 0; border-radius: 8px; padding: 11px 15px; color: white; background: var(--green); font-size: 12px; font-weight: 650; }
+		.primary:hover { background: #2c583d; }
+		.metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 15px; margin-bottom: 19px; }
+		.card { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; }
+		.metric { padding: 18px; }
+		.metric-top { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 11px; }
+		.metric-icon { width: 31px; height: 31px; border-radius: 9px; display: grid; place-items: center; background: #f2f4ef; font-size: 15px; }
+		.metric-value { margin: 15px 0 7px; font-size: 25px; font-weight: 750; letter-spacing: -.7px; }
+		.trend { color: var(--green); font-size: 10px; font-weight: 650; }
+		.trend span { color: var(--muted); font-weight: 450; margin-left: 4px; }
+		.dashboard-grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(260px, 1fr); gap: 17px; margin-bottom: 18px; }
+		.panel { padding: 19px; }
+		.panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 17px; }
+		.panel-heading h2 { margin: 0; font-size: 14px; }
+		.panel-heading p { margin: 4px 0 0; color: var(--muted); font-size: 10px; }
+		.select { padding: 7px 9px; border: 1px solid var(--line); border-radius: 7px; color: #555950; background: white; font-size: 10px; }
+		.chart-summary { display: flex; align-items: baseline; gap: 9px; margin-bottom: 5px; }
+		.chart-summary strong { font-size: 22px; }
+		.chart-summary span { color: var(--green); font-size: 10px; }
+		.chart { width: 100%; height: 180px; display: block; overflow: visible; }
+		.gridline { stroke: #eceee8; stroke-width: 1; }
+		.chart-label { fill: #90948c; font-size: 9px; }
+		.chart-area { fill: url(#areaFill); }
+		.chart-line { fill: none; stroke: var(--green); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+		.progress-wrap { display: grid; place-items: center; padding: 7px 0 11px; }
+		.donut { width: 136px; height: 136px; border-radius: 50%; background: conic-gradient(var(--green) 0 42%, #80a489 42% 69%, #d7e3d6 69% 86%, #f0c58e 86% 100%); display: grid; place-items: center; }
+		.donut-inner { width: 92px; height: 92px; background: white; border-radius: 50%; display: grid; align-content: center; justify-items: center; }
+		.donut-inner strong { font-size: 20px; }
+		.donut-inner span { color: var(--muted); font-size: 9px; }
+		.legend { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 10px; }
+		.legend-item { display: flex; align-items: center; gap: 7px; color: #62665f; font-size: 10px; }
+		.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex: 0 0 auto; }
+		.dot.two { background: #80a489; }.dot.three { background: #d7e3d6; }.dot.four { background: #f0c58e; }
+		.table-panel { overflow: hidden; }
+		.table-head { padding: 18px 19px 13px; display: flex; justify-content: space-between; align-items: center; }
+		.table-head h2 { margin: 0; font-size: 14px; }
+		.menu-admin { margin: 18px 0; padding: 19px; }
+		.menu-admin h2 { margin: 0; font-size: 14px; }
+		.menu-admin__intro { margin: 4px 0 17px; color: var(--muted); font-size: 11px; }
+		.menu-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+		.menu-form label { display: grid; gap: 6px; color: #62665f; font-size: 11px; font-weight: 650; }
+		.menu-form input, .menu-form textarea { width: 100%; padding: 10px 11px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: white; font: inherit; font-size: 12px; }
+		.menu-form textarea { min-height: 42px; resize: vertical; }
+		.menu-form input[type="file"] { padding: 8px; }
+		.menu-form__image-preview { width: 100px; height: 80px; object-fit: cover; border: 1px solid var(--line); border-radius: 8px; }
+		.menu-item-image { width: 48px; height: 40px; object-fit: cover; border-radius: 6px; vertical-align: middle; }
+		.menu-form__wide { grid-column: 1 / -1; }
+		.menu-form__actions { display: flex; align-items: center; gap: 12px; }
+		.menu-form__message { margin: 0; color: var(--muted); font-size: 11px; }
+		.menu-items { margin-top: 20px; }
+		.menu-items td { white-space: normal; }
+		@media (max-width: 520px) { .menu-form { grid-template-columns: 1fr; }.menu-form__wide { grid-column: auto; }.menu-form__actions { align-items: flex-start; flex-direction: column; } }
+		.text-button { color: var(--green); background: none; border: 0; font-size: 11px; font-weight: 650; }
+		.table-scroll { overflow-x: auto; }
+		table { width: 100%; border-collapse: collapse; text-align: left; white-space: nowrap; }
+		th { padding: 11px 19px; color: #898d85; background: #fafaf8; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: 9px; font-weight: 650; text-transform: uppercase; letter-spacing: .5px; }
+		td { padding: 13px 19px; border-bottom: 1px solid #f0f0eb; font-size: 11px; }
+		tbody tr:last-child td { border-bottom: 0; }
+		.order-id { font-weight: 700; }
+		.customer { display: flex; align-items: center; gap: 8px; }
+		.mini-avatar { width: 25px; height: 25px; display: grid; place-items: center; border-radius: 50%; background: #f1e9dd; color: #86633d; font-size: 9px; }
+		.status { display: inline-flex; align-items: center; gap: 5px; padding: 5px 8px; border-radius: 20px; color: #446c50; background: #edf5ed; font-size: 9px; }
+		.status.preparing { color: #9a6b24; background: #fbf3e5; }
+		.status.ready { color: #56718c; background: #edf3f8; }
+		.status::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+		.empty-state { padding: 24px; color: var(--muted); text-align: center; font-size: 12px; }
+		@media (max-width: 1000px) { .layout { grid-template-columns: 205px minmax(0, 1fr); }.metrics { grid-template-columns: repeat(2, 1fr); }.content { padding: 25px 22px; }.topbar { padding: 0 22px; } }
+		@media (max-width: 720px) { .layout { display: block; }.sidebar { padding: 12px 15px; border-right: 0; border-bottom: 1px solid var(--line); }.brand { padding: 0 3px 12px; }.nav-label, .side-bottom { display: none; }.nav { display: flex; overflow-x: auto; gap: 5px; }.nav a { flex: 0 0 auto; min-height: 36px; padding: 0 10px; }.nav a span:last-child { display: none; }.topbar { height: 58px; padding: 0 17px; }.content { padding: 23px 15px; }.dashboard-grid { grid-template-columns: 1fr; }.date-label { display: none; } }
+		@media (max-width: 480px) { .metrics { gap: 9px; }.metric { padding: 13px; }.metric-value { font-size: 21px; }.heading { align-items: flex-start; }.heading h1 { font-size: 22px; }.primary { padding: 10px; font-size: 10px; }.profile span:last-child { display: none; }.panel { padding: 14px; } }
+	</style>
+</head>
+<body>
+	<div class="layout">
+		<aside class="sidebar" aria-label="Main navigation">
+			<div class="brand"><span class="brand-mark">✦</span><span>Temi &amp; Bliss</span></div>
+			<div class="nav-label">WORKSPACE</div>
+			<nav class="nav">
+				<a class="active" href="#overview"><span class="nav-icon">▦</span><span>Overview</span></a>
+				<a href="#orders"><span class="nav-icon">▤</span><span>Orders</span></a>
+				<a href="#menu"><span class="nav-icon">☷</span><span>Menu</span></a>
+				<a href="#customers"><span class="nav-icon">♙</span><span>Customers</span></a>
+				<a href="#analytics"><span class="nav-icon">▥</span><span>Analytics</span></a>
+				<a href="#settings"><span class="nav-icon">⚙</span><span>Settings</span></a>
+			</nav>
+			<div class="side-bottom"><div class="help-card"><strong>Need a hand?</strong><p>Visit the help center for tips on managing your restaurant.</p></div></div>
+		</aside>
+
+		<main id="overview">
+			<header class="topbar">
+				<div class="crumb">Restaurant / <strong>Overview</strong></div>
+				<div class="top-actions"><span class="date-label" id="today"></span><button class="icon-button" aria-label="Notifications">♧</button><div class="profile"><span class="avatar">JD</span><span>Director Bliss</span></div></div>
+			</header>
+			<div class="content">
+				<section class="heading"><div><h1>Good morning, Chef Bliss 👋</h1><p class="subtitle">Here’s what’s happening at your restaurant today.</p></div><button class="primary" id="new-order">＋ New order</button></section>
+
+				<section class="metrics" aria-label="Today's metrics">
+					<article class="card metric"><div class="metric-top"><span>Today's revenue</span><span class="metric-icon">₦</span></div><div class="metric-value" id="revenue-total">₦0</div><div class="trend" id="revenue-trend">— <span>vs. today</span></div></article>
+					<article class="card metric"><div class="metric-top"><span>Total orders</span><span class="metric-icon">▤</span></div><div class="metric-value" id="total-orders">0</div><div class="trend" id="orders-trend">— <span>in queue</span></div></article>
+					<article class="card metric"><div class="metric-top"><span>Avg. order value</span><span class="metric-icon">◉</span></div><div class="metric-value" id="avg-order-value">₦0</div><div class="trend" id="avg-trend">— <span>per order</span></div></article>
+					<article class="card metric"><div class="metric-top"><span>Pending orders</span><span class="metric-icon">▣</span></div><div class="metric-value" id="pending-orders">0</div><div class="trend" id="pending-trend">— <span>need attention</span></div></article>
+				</section>
+
+				<section class="card menu-admin" id="menu">
+					<h2>Add food to the menu</h2>
+					<p class="menu-admin__intro">New items are saved and appear on the home page and full menu.</p>
+					<form class="menu-form" id="menu-form">
+						<label>Name
+							<input id="food-name" name="name" type="text" maxlength="100" required>
+						</label>
+						<label>Price (₦)
+							<input id="food-price" name="price" type="number" min="1" step="1" required>
+						</label>
+						<label class="menu-form__wide">Description
+							<textarea id="food-description" name="description" maxlength="500" required></textarea>
+						</label>
+						<label class="menu-form__wide">Food picture (optional, PNG/JPEG/WebP, max 5 MB)
+							<input id="food-image" name="image" type="file" accept="image/png,image/jpeg,image/webp">
+							<img id="food-image-preview" class="menu-form__image-preview" alt="Selected food picture preview" hidden>
+						</label>
+						<div class="menu-form__wide menu-form__actions">
+							<button class="primary" id="add-food-button" type="submit">Add food</button>
+							<p class="menu-form__message" id="menu-form-message" role="status" aria-live="polite"></p>
+						</div>
+					</form>
+					<div class="table-scroll menu-items">
+						<table><thead><tr><th>Picture</th><th>Food</th><th>Description</th><th>Price</th></tr></thead><tbody id="menu-items-list"><tr><td colspan="4" class="empty-state">Loading menu…</td></tr></tbody></table>
+					</div>
+				</section>
+
+				<section class="dashboard-grid">
+					<article class="card panel" id="analytics">
+						<div class="panel-heading"><div><h2>Revenue overview</h2><p>Track your restaurant's performance</p></div><select class="select" aria-label="Revenue timeframe"><option>This week</option><option>This month</option><option>This year</option></select></div>
+						<div class="chart-summary"><strong>$18,425</strong><span>↗ 10.6%</span></div>
+						<svg class="chart" viewBox="0 0 620 190" preserveAspectRatio="none" role="img" aria-label="Revenue chart, rising throughout the week">
+							<defs><linearGradient id="areaFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#6c9a74" stop-opacity=".23"/><stop offset="100%" stop-color="#6c9a74" stop-opacity="0"/></linearGradient></defs>
+							<line class="gridline" x1="40" y1="25" x2="610" y2="25"/><line class="gridline" x1="40" y1="70" x2="610" y2="70"/><line class="gridline" x1="40" y1="115" x2="610" y2="115"/><line class="gridline" x1="40" y1="160" x2="610" y2="160"/>
+							<text class="chart-label" x="2" y="28">$4k</text><text class="chart-label" x="2" y="73">$3k</text><text class="chart-label" x="2" y="118">$2k</text><text class="chart-label" x="2" y="163">$1k</text>
+							<path class="chart-area" d="M40 133 C75 126 80 114 130 118 S190 95 225 105 S290 76 325 91 S390 59 420 75 S475 48 510 61 S570 37 610 42 L610 165 L40 165Z"/>
+							<path class="chart-line" d="M40 133 C75 126 80 114 130 118 S190 95 225 105 S290 76 325 91 S390 59 420 75 S475 48 510 61 S570 37 610 42"/>
+							<text class="chart-label" x="38" y="183">Mon</text><text class="chart-label" x="130" y="183">Tue</text><text class="chart-label" x="225" y="183">Wed</text><text class="chart-label" x="322" y="183">Thu</text><text class="chart-label" x="418" y="183">Fri</text><text class="chart-label" x="513" y="183">Sat</text><text class="chart-label" x="594" y="183">Sun</text>
+						</svg>
+					</article>
+					<article class="card panel">
+						<div class="panel-heading"><div><h2>Popular categories</h2><p>Sales breakdown this week</p></div><button class="text-button" type="button">Details</button></div>
+						<div class="progress-wrap"><div class="donut" role="img" aria-label="Category sales breakdown"><div class="donut-inner"><strong>100%</strong><span>of sales</span></div></div></div>
+						<div class="legend"><div class="legend-item"><span class="dot"></span>Main dishes · 42%</div><div class="legend-item"><span class="dot two"></span>Drinks · 27%</div><div class="legend-item"><span class="dot three"></span>Starters · 17%</div><div class="legend-item"><span class="dot four"></span>Desserts · 14%</div></div>
+					</article>
+				</section>
+
+				<section class="card table-panel" id="orders">
+					<div class="table-head"><h2>Recent orders</h2><button class="text-button" id="view-orders" type="button">View all orders →</button></div>
+					<div class="table-scroll"><table><thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Time</th><th>Total</th><th>Status</th></tr></thead><tbody id="orders-list"><tr><td colspan="6" class="empty-state">Loading orders…</td></tr></tbody></table></div>
+				</section>
+			</div>
+		</main>
+	</div>
+	<script>
+		const DEFAULT_ADMIN_TOKEN = 'zoe-admin-secret-change-me';
+		const API_URL = `${window.location.origin}/api`;
+		const state = {
+			token: localStorage.getItem('zoe-admin-token') || DEFAULT_ADMIN_TOKEN,
+			orders: [],
+			menuItems: [],
+		};
+
+		const today = new Date();
+		document.getElementById('today').textContent = today.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+
+		const orderBadgeClassMap = {
+			pending: 'status',
+			paid: 'status',
+			preparing: 'status preparing',
+			delivering: 'status ready',
+			completed: 'status',
+			cancelled: 'status ready',
+		};
+		const orderLabelMap = {
+			pending: 'Pending',
+			paid: 'Paid',
+			preparing: 'Preparing',
+			delivering: 'Delivering',
+			completed: 'Completed',
+			cancelled: 'Cancelled',
+		};
+
+		const formatCurrency = value => `₦${Number(value || 0).toLocaleString()}`;
+		const formatItemsText = items => {
+			if (!Array.isArray(items) || !items.length) return '0 items';
+			const total = items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
+			return `${total} ${total === 1 ? 'item' : 'items'}`;
+		};
+		const formatDisplayTime = value => {
+			const date = value ? new Date(value) : new Date();
+			if (Number.isNaN(date.getTime())) return 'Just now';
+			return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+		};
+		const initialsFromName = name => {
+			if (!name || !name.trim()) return 'NA';
+			return name.trim().split(/\s+/).slice(0, 2).map(part => part[0].toUpperCase()).join('');
+		};
+		const statusMarkup = status => {
+			const safeStatus = orderBadgeClassMap[status] || 'status';
+			const label = orderLabelMap[status] || 'Pending';
+			return `<span class="${safeStatus}">${label}</span>`;
+		};
+		const updateSummaryCards = orders => {
+			const revenue = orders.reduce((sum, order) => sum + Number(order.total || 0), 0);
+			const pending = orders.filter(order => order.status === 'pending' || order.status === 'paid' || order.status === 'preparing').length;
+			document.getElementById('revenue-total').textContent = formatCurrency(revenue);
+			document.getElementById('total-orders').textContent = String(orders.length);
+			document.getElementById('avg-order-value').textContent = orders.length ? formatCurrency(revenue / orders.length) : formatCurrency(0);
+			document.getElementById('pending-orders').textContent = String(pending);
+			document.getElementById('revenue-trend').innerHTML = `${orders.length ? '↗' : '—'} ${orders.length ? 'live order data' : 'no data'} <span>vs. today</span>`;
+			document.getElementById('orders-trend').innerHTML = `${orders.length ? '↗' : '—'} ${orders.length ? 'current queue' : 'waiting'} <span>in queue</span>`;
+			document.getElementById('avg-trend').innerHTML = `${orders.length ? '↗' : '—'} ${orders.length ? 'average' : 'idle'} <span>per order</span>`;
+			document.getElementById('pending-trend').innerHTML = `${pending ? '↗' : '—'} ${pending ? 'needs review' : 'clear'} <span>need attention</span>`;
+		};
+		const renderOrders = () => {
+			const body = document.getElementById('orders-list');
+			if (!state.orders.length) {
+				body.innerHTML = '<tr><td colspan="6" class="empty-state">No orders found yet.</td></tr>';
+				return;
+			}
+
+			body.innerHTML = state.orders.map(order => {
+				const customerName = order.customer?.name || 'Guest';
+				const initials = initialsFromName(customerName);
+				const items = Array.isArray(order.items) ? order.items : [];
+				return `
+					<tr>
+						<td class="order-id">#${String(order._id || '').slice(-4) || 'NEW'}</td>
+						<td><div class="customer"><span class="mini-avatar">${initials}</span>${customerName}</div></td>
+						<td>${formatItemsText(items)}</td>
+						<td>${formatDisplayTime(order.createdAt)}</td>
+						<td>${formatCurrency(order.total || 0)}</td>
+						<td>${statusMarkup(order.status)}</td>
+					</tr>`;
+			}).join('');
+		};
+		async function fetchOrders() {
+			const response = await fetch(`${API_URL}/orders/admin/all`, {
+				headers: {
+					'Content-Type': 'application/json',
+					'x-admin-token': state.token,
+				},
+			});
+			if (!response.ok) {
+				const data = await response.json().catch(() => ({}));
+				throw new Error(data.error || 'Unable to load orders.');
+			}
+			return response.json();
+		}
+		async function loadOrders() {
+			try {
+				const orders = await fetchOrders();
+				state.orders = Array.isArray(orders) ? orders : [];
+				updateSummaryCards(state.orders);
+				renderOrders();
+			} catch (error) {
+				console.error('Failed to load orders:', error);
+				const body = document.getElementById('orders-list');
+				body.innerHTML = `<tr><td colspan="6" class="empty-state">${error.message || 'Unable to load orders. Check the admin token.'}</td></tr>`;
+				if (error.message.includes('Unauthorized') || error.message.includes('Forbidden') || error.message.includes('token')) {
+					const saved = localStorage.getItem('zoe-admin-token');
+					const token = window.prompt('Enter the admin token to view orders:', saved || DEFAULT_ADMIN_TOKEN);
+					if (token !== null) {
+						state.token = token.trim();
+						if (state.token) {
+							localStorage.setItem('zoe-admin-token', state.token);
+						} else {
+							localStorage.removeItem('zoe-admin-token');
+						}
+						loadOrders();
+					}
+				}
+			}
+		}
+
+		const menuForm = document.getElementById('menu-form');
+		const menuFormMessage = document.getElementById('menu-form-message');
+		const addFoodButton = document.getElementById('add-food-button');
+		const foodImageInput = document.getElementById('food-image');
+		const foodImagePreview = document.getElementById('food-image-preview');
+		const maxFoodImageBytes = 5 * 1024 * 1024;
+		const acceptedFoodImageTypes = ['image/jpeg', 'image/png', 'image/webp'];
+		let foodImagePreviewUrl;
+
+		function clearFoodImagePreview() {
+			if (foodImagePreviewUrl) {
+				URL.revokeObjectURL(foodImagePreviewUrl);
+				foodImagePreviewUrl = undefined;
+			}
+			foodImagePreview.hidden = true;
+			foodImagePreview.removeAttribute('src');
+		}
+
+		foodImageInput.addEventListener('change', () => {
+			const file = foodImageInput.files[0];
+			if (!file) {
+				clearFoodImagePreview();
+				return;
+			}
+			if (!acceptedFoodImageTypes.includes(file.type) || file.size > maxFoodImageBytes) {
+				foodImageInput.value = '';
+				clearFoodImagePreview();
+				menuFormMessage.textContent = 'Choose a PNG, JPEG, or WebP picture no larger than 5 MB.';
+				return;
+			}
+
+			clearFoodImagePreview();
+			foodImagePreviewUrl = URL.createObjectURL(file);
+			foodImagePreview.src = foodImagePreviewUrl;
+			foodImagePreview.hidden = false;
+			menuFormMessage.textContent = '';
+		});
+
+		function readImageAsDataUrl(file) {
+			return new Promise((resolve, reject) => {
+				const reader = new FileReader();
+				reader.addEventListener('load', () => {
+					if (typeof reader.result !== 'string') {
+						reject(new Error('Unable to read the selected food picture.'));
+						return;
+					}
+					resolve(reader.result);
+				}, { once: true });
+				reader.addEventListener('error', () => reject(new Error('Unable to read the selected food picture.')), { once: true });
+				reader.readAsDataURL(file);
+			});
+		}
+
+		function renderMenuItems() {
+			const body = document.getElementById('menu-items-list');
+			body.replaceChildren();
+			if (!state.menuItems.length) {
+				const row = body.insertRow();
+				const cell = row.insertCell();
+				cell.colSpan = 4;
+				cell.className = 'empty-state';
+				cell.textContent = 'No menu items found.';
+				return;
+			}
+
+			state.menuItems.forEach(item => {
+				const row = body.insertRow();
+				const imageCell = row.insertCell();
+				const image = document.createElement('img');
+				image.className = 'menu-item-image';
+				image.src = item.image || 'img/dish.svg';
+				image.alt = `${item.name} picture`;
+				image.onerror = () => {
+					image.onerror = null;
+					image.src = 'img/dish.svg';
+				};
+				imageCell.appendChild(image);
+				[item.name, item.description || '—', formatCurrency(item.price)].forEach(value => {
+					const cell = row.insertCell();
+					cell.textContent = value;
+				});
+			});
+		}
+
+		async function loadMenuItems() {
+			const response = await fetch(`${API_URL}/menu`, { cache: 'no-store' });
+			if (!response.ok) {
+				throw new Error('Unable to load menu items.');
+			}
+			const items = await response.json();
+			if (!Array.isArray(items)) {
+				throw new Error('The server returned an invalid menu.');
+			}
+			state.menuItems = items;
+			renderMenuItems();
+		}
+
+		menuForm.addEventListener('submit', async event => {
+			event.preventDefault();
+			if (!menuForm.reportValidity()) return;
+
+			const name = document.getElementById('food-name').value.trim();
+			const description = document.getElementById('food-description').value.trim();
+			const price = Number(document.getElementById('food-price').value);
+			const imageFile = foodImageInput.files[0];
+			if (!name || !description || !Number.isSafeInteger(price) || price <= 0) {
+				menuFormMessage.textContent = 'Enter a name, description, and a whole-number price greater than zero.';
+				return;
+			}
+			if (imageFile && (!acceptedFoodImageTypes.includes(imageFile.type) || imageFile.size > maxFoodImageBytes)) {
+				menuFormMessage.textContent = 'Choose a PNG, JPEG, or WebP picture no larger than 5 MB.';
+				return;
+			}
+
+			addFoodButton.disabled = true;
+			menuFormMessage.textContent = 'Saving food…';
+			try {
+				const image = imageFile ? await readImageAsDataUrl(imageFile) : undefined;
+				const response = await fetch(`${API_URL}/menu`, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'x-admin-token': state.token,
+					},
+					body: JSON.stringify({ name, description, price, image }),
+				});
+				const data = await response.json().catch(() => ({}));
+				if (!response.ok) {
+					throw new Error(data.error || 'Unable to add this food.');
+				}
+
+				menuForm.reset();
+				clearFoodImagePreview();
+				await loadMenuItems();
+				localStorage.setItem('zoe-menu-updated', String(Date.now()));
+				menuFormMessage.textContent = `${data.name} added. It is now available on the site menu.`;
+			} catch (error) {
+				console.error('Failed to add menu item:', error);
+				menuFormMessage.textContent = error.message || 'Unable to add this food.';
+				if (error.message.includes('Unauthorized') || error.message.includes('Forbidden') || error.message.includes('token')) {
+					localStorage.removeItem('zoe-admin-token');
+					state.token = window.prompt('Enter the admin token to add menu items:', '');
+					if (state.token) {
+						state.token = state.token.trim();
+						localStorage.setItem('zoe-admin-token', state.token);
+						menuFormMessage.textContent = 'Token updated. Submit the form again to add the food.';
+					}
+				}
+			} finally {
+				addFoodButton.disabled = false;
+			}
+		});
+
+		document.getElementById('new-order').addEventListener('click', () => {
+			window.location.href = 'index.html';
+		});
+
+		document.getElementById('view-orders').addEventListener('click', () => {
+			document.getElementById('orders').scrollIntoView({ behavior: 'smooth' });
+		});
+
+		loadOrders();
+		loadMenuItems().catch(error => {
+			console.error('Failed to load menu items:', error);
+			const body = document.getElementById('menu-items-list');
+			body.replaceChildren();
+			const row = body.insertRow();
+			const cell = row.insertCell();
+			cell.colSpan = 4;
+			cell.className = 'empty-state';
+			cell.textContent = error.message;
+		});
+	</script>
+</body>
+</html>
